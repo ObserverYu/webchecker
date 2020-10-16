@@ -44,6 +44,8 @@ public class ItemList implements Serializable {
 
     private Integer apply;
 
+    private String applyUrl;
+
 
 
 

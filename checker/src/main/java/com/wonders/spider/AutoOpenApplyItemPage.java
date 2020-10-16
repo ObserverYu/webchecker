@@ -11,8 +11,11 @@ import com.ruiyun.jvppeteer.options.LaunchOptions;
 import com.ruiyun.jvppeteer.options.LaunchOptionsBuilder;
 import com.ruiyun.jvppeteer.options.PageNavigateOptions;
 import com.ruiyun.jvppeteer.options.Viewport;
+import com.wonders.WebCheckerContext;
 import com.wonders.dao.ItemListService;
 import com.wonders.spider.entity.ItemList;
+import com.wonders.spider.handler.FailLoginBrowserHandler;
+import com.wonders.spider.handler.SaveApplyUrlBrowserHandler;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -43,35 +46,40 @@ public class AutoOpenApplyItemPage {
         wait.add("domcontentloaded");
         pageNavigateOptions.setWaitUntil(wait);
         pageNavigateOptions.setTimeout(0);
-
         Page page = browser.newPage();
 
-        browser.onTrgetcreated(handler -> {
+        WebCheckerContext checkerContext = new WebCheckerContext();
+        FailLoginBrowserHandler failLoginBrowserHandler = new FailLoginBrowserHandler(checkerContext);
+        // 登录失败监听器
+        browser.onTrgetcreated(failLoginBrowserHandler);
+        // 立即办理打开的页面监听器
+        SaveApplyUrlBrowserHandler saveApplyUrlBrowserHandler = new SaveApplyUrlBrowserHandler(checkerContext);
+        saveApplyUrlBrowserHandler.setPrepareClickApplyBtn(true);
+        browser.onTrgetcreated(saveApplyUrlBrowserHandler);
 
-            Page page1 = handler.page();
-            if("https://zwdtuser.sh.gov.cn/uc/login/login.jsp".equals(handler.url())){
-                handleLoginPage(handler.url(),page1);
-            }
-            page1.onFramenavigated(handler1 ->{
-                String url = handler1.url();
-                if("https://zwdtuser.sh.gov.cn/uc/login/login.jsp".equals(url)){
-                    handleLoginPage(url,page1);
-                }
-            });
-        });
         // 有立即前往
         //page.goTo("http://zwdt.sh.gov.cn/govPortals/bsfw/item/258ca423-9a15-4527-87e1-af20ba72894c");
         // 没有立即前往
         page.goTo("http://zwdt.sh.gov.cn/govPortals/bsfw/item/16cb0bc8-7803-4fb9-983f-0b0ee7f001e2");
         ElementHandle apply = selectApplyBt(page);
-        String content = page.content();
-        boolean gotoDealWith = content.contains("gotoDealWith");
-        boolean showGjModel = content.contains("showGjModel");
-        System.out.println("gotoDealWith:"+gotoDealWith);
-        System.out.println("showGjModel:"+showGjModel);
-        ElementHandle ljqwBt = page.$("#bwptBtn");
-        boolean intersectingViewport = ljqwBt.isIntersectingViewport();
-        System.out.println(intersectingViewport);
+        if(apply != null){
+            String content = page.content();
+            // showGjModel -> 前往其他页面  gotoDealWith -> 直接跳转
+            boolean showGjModel = content.contains("showGjModel");
+            apply.click();
+            if(showGjModel){
+                ElementHandle ljqwBt = page.waitForSelector("#bwptBtn");
+                boolean intersectingViewport = ljqwBt.isIntersectingViewport();
+                int tryTimes = 5;
+                while (!intersectingViewport){
+                    Thread.sleep(200);
+                }
+                ljqwBt.click();
+            }
+        }
+        Thread.sleep(10000);
+        System.out.println("url:"+checkerContext.getNowApplyPage().mainFrame().url());
+
     }
 
     private static void handleLoginPage(String url,Page page) {

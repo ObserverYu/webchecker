@@ -4,8 +4,9 @@ import cn.hutool.core.util.StrUtil;
 import com.ruiyun.jvppeteer.core.page.Frame;
 import com.ruiyun.jvppeteer.core.page.Page;
 import com.ruiyun.jvppeteer.events.EventHandler;
+import com.wonders.WebCheckerContext;
 import com.wonders.spider.CorporatePageSpider;
-import com.wonders.spider.PageHandleUtil;
+import com.wonders.util.PageHandleUtil;
 
 /**
  * 登录失败处理
@@ -20,9 +21,16 @@ public class FailLoginPageHandler implements EventHandler<Frame> {
 
     private Page page;
 
+    private WebCheckerContext webCheckerContext;
+
     public FailLoginPageHandler(CorporatePageSpider corporatePageSpider, Page page) {
         this.corporatePageSpider = corporatePageSpider;
         this.page = page;
+    }
+
+    public FailLoginPageHandler(WebCheckerContext webCheckerContext,Page page) {
+        this.page = page;
+        this.webCheckerContext = webCheckerContext;
     }
 
     @Override
@@ -31,9 +39,11 @@ public class FailLoginPageHandler implements EventHandler<Frame> {
         if(StrUtil.isBlank(url)){
             return;
         }
-        if(!url.equals(PageHandleUtil.personLoginUrl) && !url.equals(PageHandleUtil.corporateLoginUrl)){
+        if(!url.startsWith(PageHandleUtil.personLoginUrl) && !url.startsWith(PageHandleUtil.corporateLoginUrl)){
             return;
         }
+        webCheckerContext.getUi().changeStatusInfo("检测到登录页面,开始自动登录流程");
         PageHandleUtil.handleLoginPage(url,page);
+        webCheckerContext.getUi().changeStatusInfo("立即办理页面已经打开,请判断页面是否异常,按快捷键确认");
     }
 }

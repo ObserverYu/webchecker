@@ -1,8 +1,7 @@
 package com.wonders.ui.listener;
 
 
-import com.wonders.ui.WebCheckerRunner;
-
+import com.wonders.WebCheckerContext;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -17,6 +16,11 @@ import java.awt.event.ActionListener;
  
 public class ChoseBrowserListener implements ActionListener {
 
+    private WebCheckerContext webCheckerContext;
+
+    public ChoseBrowserListener(WebCheckerContext webCheckerContext) {
+        this.webCheckerContext = webCheckerContext;
+    }
 
     /**
      * Invoked when an action occurs.
@@ -32,7 +36,7 @@ public class ChoseBrowserListener implements ActionListener {
         int returnVal = fDialog.showOpenDialog(null);
         // 如果是选择了文件
         if(JFileChooser.APPROVE_OPTION == returnVal){
-            JTextField bowserInput = WebCheckerRunner.context.getBrowserInput();
+            JTextField bowserInput = this.webCheckerContext.getUi().getBrowserInput();
             bowserInput.setText(fDialog.getSelectedFile().getPath());
         }
     }

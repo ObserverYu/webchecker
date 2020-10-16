@@ -15,6 +15,7 @@
         <result column="checker" property="checker"/>
         <result column="result" property="result"/>
         <result column="apply" property="apply"/>
+        <result column="apply_url" property="applyUrl"/>
     </resultMap>
  
     <!-- 通用查询结果列 -->
@@ -30,12 +31,14 @@
             t.checker,
             t.result,
             t.apply,
+            t.apply_url,
     </sql>
 
     <update id="update">
         update item_list
         set result = #{item.result}
         ,apply = #{item.apply}
+        ,apply_url = #{item.applyUrl}
         where id = #{item.id}
     </update>
 

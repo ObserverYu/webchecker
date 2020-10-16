@@ -1,4 +1,4 @@
-package com.wonders.spider;
+package com.wonders.util;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.ruiyun.jvppeteer.core.page.ElementHandle;
@@ -52,7 +52,7 @@ public class PageHandleUtil {
     * @date 2020/10/15 17:48
     */
     public static void handleLoginPage(String url,Page page) {
-        if(!url.equals(personLoginUrl) && !url.equals(corporateLoginUrl)){
+        if(!url.startsWith(personLoginUrl) && !url.startsWith(corporateLoginUrl)){
             return;
         }
         PageNavigateOptions pageNavigateOptions = new PageNavigateOptions();
@@ -60,7 +60,7 @@ public class PageHandleUtil {
         wait.add("domcontentloaded");
         pageNavigateOptions.setWaitUntil(wait);
         try{
-            if(personLoginUrl.equals(url)){
+            if(personLoginUrl.startsWith(url)){
                 // 点击法人登录
                 ElementHandle header = page.waitForSelector("#login-hearder");
                 ElementHandle a = header.$(".corporate");
@@ -86,7 +86,6 @@ public class PageHandleUtil {
             // 点击登录
             ElementHandle login = page.waitForSelector("#loginbtn");
             login.click();
-            page.waitForNavigation(pageNavigateOptions);
         }catch (Exception e){
             e.printStackTrace();
         }
