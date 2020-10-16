@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wonders.dao.ItemListMapper">
+ 
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wonders.spider.entity.ItemList">
+        <id column="id" property="id"/>
+        <result column="item_code" property="itemCode"/>
+        <result column="item_type" property="itemType"/>
+        <result column="weiban" property="weiban"/>
+        <result column="item_name" property="itemName"/>
+        <result column="fenxiang" property="fenxiang"/>
+        <result column="qingxing" property="qingxing"/>
+        <result column="url" property="url"/>
+        <result column="checker" property="checker"/>
+        <result column="result" property="result"/>
+        <result column="apply" property="apply"/>
+    </resultMap>
+ 
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+            t.id,
+            t.item_code,
+            t.item_type,
+            t.weiban,
+            t.item_name,
+            t.fenxiang,
+            t.qingxing,
+            t.url,
+            t.checker,
+            t.result,
+            t.apply,
+    </sql>
+
+    <update id="update">
+        update item_list
+        set result = #{item.result}
+        ,apply = #{item.apply}
+        where id = #{item.id}
+    </update>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        select * from item_list
+    </select>
+
+
+    <select id="selectByWeiBanList" resultMap="BaseResultMap">
+        select * from item_list
+        where weiban in
+        <foreach collection="list" index="index" close=")" open="(" separator="," item="item">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="selectByWeiBanListAndCondition" resultMap="BaseResultMap">
+        select * from item_list
+        where weiban in
+        <foreach collection="weiban" index="index" close=")" open="(" separator="," item="item">
+            #{item}
+        </foreach>
+        <if test="apply != null">
+            and apply = #{apply}
+        </if>
+        <if test="result != null and result != ''">
+            and result = #{result}
+        </if>
+    </select>
+</mapper>

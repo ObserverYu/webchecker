@@ -1,0 +1,13 @@
+url.js:154
+    throw new ERR_INVALID_ARG_TYPE('url', 'string', url);
+    ^
+
+TypeError [ERR_INVALID_ARG_TYPE]: The "url" argument must be of type string. Received type undefined
+    at Url.parse (url.js:154:11)
+    at Object.urlParse [as parse] (url.js:148:13)
+    at AnalysisLSPServer.handle_file_event (C:\Users\Observer\.IntelliJIdea2018.1\config\plugins\org.jboss.tools.intellij.analytics\lib\server\server.js:88:29)
+    at Timeout.setTimeout [as _onTimeout] (C:\Users\Observer\.IntelliJIdea2018.1\config\plugins\org.jboss.tools.intellij.analytics\lib\server\server.js:315:16)
+    at ontimeout (timers.js:436:11)
+    at tryOnTimeout (timers.js:300:5)
+    at listOnTimeout (timers.js:263:5)
+    at Timer.processTimers (timers.js:223:10)
