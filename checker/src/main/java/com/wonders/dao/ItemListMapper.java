@@ -23,5 +23,7 @@ public interface ItemListMapper{
     List<ItemList> selectByWeiBanListAndCondition(@Param("weiban") List<String> weiban
             , @Param("apply") Integer apply, @Param("result") String result);
 
+    List<ItemList> selectByIdFanwei(@Param("from")Integer idFrom,@Param("to") Integer idTo);
+
     void update(@Param("item") ItemList item);
 }

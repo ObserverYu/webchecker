@@ -86,7 +86,7 @@ public class WebCheckerUi {
         // 浏览器路径输入行
         Container contentPane = showFrame.getContentPane();
         inputJp = new JPanel();
-        browserInput = new JTextField("浏览器路径",40);
+        browserInput = new JTextField("C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",40);
         //browserInput.setEnabled(false);
         choseBrowser = new JButton("浏览");
         choseBrowser.addActionListener(new ChoseBrowserListener(webCheckerContext));

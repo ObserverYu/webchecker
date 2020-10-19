@@ -16,6 +16,11 @@
         <result column="result" property="result"/>
         <result column="apply" property="apply"/>
         <result column="apply_url" property="applyUrl"/>
+        <result column="apply_status" property="applyStatus"/>
+        <result column="tencode" property="tencode"/>
+        <result column="area" property="area"/>
+        <result column="apply_code" property="applyCode"/>
+        <result column="weiban_name" property="weibanName"/>
     </resultMap>
  
     <!-- 通用查询结果列 -->
@@ -39,6 +44,7 @@
         set result = #{item.result}
         ,apply = #{item.apply}
         ,apply_url = #{item.applyUrl}
+        ,apply_status = #{item.applyStatus}
         where id = #{item.id}
     </update>
 
@@ -68,4 +74,9 @@
             and result = #{result}
         </if>
     </select>
+
+    <select id="selectByIdFanwei" resultMap="BaseResultMap">
+        select * from item_list where id between #{from} and #{to} and result = '未检查'
+    </select>
+
 </mapper>

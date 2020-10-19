@@ -14,7 +14,7 @@ import java.util.concurrent.CountDownLatch;
  **/
 
 @Data
-public class ApplyPageHotkeyListener implements HotkeyListener {
+public class ApplyPageNewHotkeyListener implements HotkeyListener {
 
     private WebCheckerContext webCheckerContext;
     private CountDownLatch countDownLatch;
@@ -47,10 +47,8 @@ public class ApplyPageHotkeyListener implements HotkeyListener {
         }
         if(this.itemList != null){
             Page nowApplyPage = webCheckerContext.getNowApplyPage();
-            if(nowApplyPage != null){
-                String url = nowApplyPage.mainFrame().url();
-                System.out.println(url);
-            }
+            String url = nowApplyPage.mainFrame().url();
+            System.out.println(url);
             itemList.setResult(result);
             this.itemList = null;
         }

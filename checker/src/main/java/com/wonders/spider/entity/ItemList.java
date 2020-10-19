@@ -46,6 +46,12 @@ public class ItemList implements Serializable {
 
     private String applyUrl;
 
+    private String applyStatus;
+    private String tencode;
+    private String area;
+    private String applyCode;
+    private String weibanName;
+
 
 
 

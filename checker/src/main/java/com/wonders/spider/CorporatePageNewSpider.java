@@ -35,7 +35,7 @@ import java.util.concurrent.LinkedBlockingDeque;
  **/
 
 @Data
-public class CorporatePageSpider implements PageSpider {
+public class CorporatePageNewSpider implements PageSpider {
 
     WebCheckerContext webCheckerContext;
 
@@ -56,12 +56,12 @@ public class CorporatePageSpider implements PageSpider {
 
     private SaveApplyUrlBrowserHandler saveApplyUrlBrowserHandler;
 
-    public static CorporatePageSpider build() throws IOException {
+    public static CorporatePageNewSpider build() throws IOException {
         return build(null, null);
     }
 
-    public static CorporatePageSpider build(String browserPath, WebCheckerContext webCheckerContext) throws IOException {
-        CorporatePageSpider corporatePageSpider = new CorporatePageSpider();
+    public static CorporatePageNewSpider build(String browserPath, WebCheckerContext webCheckerContext) throws IOException {
+        CorporatePageNewSpider corporatePageSpider = new CorporatePageNewSpider();
         corporatePageSpider.setWebCheckerContext(webCheckerContext);
         corporatePageSpider.createBrowser(browserPath);
         // 设置浏览器的监听器
@@ -95,11 +95,11 @@ public class CorporatePageSpider implements PageSpider {
         FailLoginBrowserHandler failLoginBrowserHandler = new FailLoginBrowserHandler(webCheckerContext);
         this.setFailLoginBrowserHandler(failLoginBrowserHandler);
         // 登录失败监听器
-        browser.onTrgetcreated(failLoginBrowserHandler);
+        //browser.onTrgetcreated(failLoginBrowserHandler);
         // 立即办理打开的页面监听器
-        SaveApplyUrlBrowserHandler saveApplyUrlBrowserHandler = new SaveApplyUrlBrowserHandler(webCheckerContext);
-        this.saveApplyUrlBrowserHandler = saveApplyUrlBrowserHandler;
-        browser.onTrgetcreated(saveApplyUrlBrowserHandler);
+        //SaveApplyUrlBrowserHandler saveApplyUrlBrowserHandler = new SaveApplyUrlBrowserHandler(webCheckerContext);
+        //this.saveApplyUrlBrowserHandler = saveApplyUrlBrowserHandler;
+       // browser.onTrgetcreated(saveApplyUrlBrowserHandler);
     }
 
     public Page handleOneItemPage(String url) throws ExecutionException, InterruptedException {
@@ -167,10 +167,10 @@ public class CorporatePageSpider implements PageSpider {
             ui.changeStatusInfo("正在进行首次登录");
             // 首次登录
             Page login = browser.newPage();
-            login.goTo("https://zwdtuser.sh.gov.cn:7443/tsoauth/login.jsp");
-            PageHandleUtil.handleLoginPage("https://zwdtuser.sh.gov.cn:7443/tsoauth/login.jsp",login);
-            Thread.sleep(3000);
-            this.failLoginBrowserHandler.setFirstLogin(false);
+            login.goTo("https://zwdtuser.sh.gov.cn/uc/login/login.jsp");
+            //PageHandleUtil.handleLoginPage("https://zwdtuser.sh.gov.cn:7443/tsoauth/login.jsp",login);
+            Thread.sleep(10000);
+            //this.failLoginBrowserHandler.setFirstLogin(false);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -188,25 +188,14 @@ public class CorporatePageSpider implements PageSpider {
             try {
                 Page page = browser.newPage();
                 ui.changeStatusInfo("正在扫描事项:" + itemList.getItemCode() + " " + itemList.getItemName());
-                page.goTo(itemList.getUrl(), pageNavigateOptions);
+                page.goTo(itemList.getApplyUrl(), pageNavigateOptions);
                 webCheckerContext.setNowInfoPage(page);
                 ui.changeStatusInfo("正在检查是否有立即办理");
-                // 检查是否有立即办理按钮
-                ElementHandle applyBtn = checkApplyButton(page, itemList);
                 CountDownLatch countDownLatch = new CountDownLatch(1);
-                if(applyBtn != null){
-                    ui.changeStatusInfo("有立即办理,打开");
-                    itemList.setApply(1);
-                    // 点击立即办理按钮
-                    clickApply(page,applyBtn);
-                }else {
-                    itemList.setApply(0);
-                }
                 listenUserKey(applyPageHotkeyListener,countDownLatch,itemList);
                 countDownLatch.await();
                 updateList.put(itemList);
-                webCheckerContext.getNowApplyPage().close();
-                webCheckerContext.getNowInfoPage().close();
+                page.close();
             } catch (Exception e) {
                 e.printStackTrace();
                 System.out.println("打开页面时被打断");
