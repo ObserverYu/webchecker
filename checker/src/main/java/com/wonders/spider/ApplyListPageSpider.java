@@ -13,11 +13,13 @@ import com.ruiyun.jvppeteer.options.LaunchOptionsBuilder;
 import com.ruiyun.jvppeteer.options.PageNavigateOptions;
 import com.ruiyun.jvppeteer.options.Viewport;
 import com.wonders.WebCheckerContext;
-import com.wonders.dao.DaoService;
-import com.wonders.spider.entity.ItemList;
-import com.wonders.spider.handler.ApplyPageHotkeyListener;
+import com.wonders.dao.service.DaoService;
+import com.wonders.dao.entity.ApplyList;
+import com.wonders.dao.entity.ItemList;
+import com.wonders.hotkey.NewApplyPageHotkeyListener;
 import com.wonders.spider.handler.FailLoginBrowserHandler;
 import com.wonders.spider.handler.SaveApplyUrlBrowserHandler;
+import com.wonders.ui.webinnerevent.ChangeInfoInnerEvent;
 import com.wonders.ui.WebCheckerUi;
 import com.wonders.util.PageHandleUtil;
 import lombok.Data;
@@ -35,7 +37,7 @@ import java.util.concurrent.LinkedBlockingDeque;
  **/
 
 @Data
-public class CorporatePageNewSpider implements PageSpider {
+public class ApplyListPageSpider implements PageSpider<ApplyList> {
 
     WebCheckerContext webCheckerContext;
 
@@ -56,12 +58,12 @@ public class CorporatePageNewSpider implements PageSpider {
 
     private SaveApplyUrlBrowserHandler saveApplyUrlBrowserHandler;
 
-    public static CorporatePageNewSpider build() throws IOException {
+    public static ApplyListPageSpider build() throws IOException {
         return build(null, null);
     }
 
-    public static CorporatePageNewSpider build(String browserPath, WebCheckerContext webCheckerContext) throws IOException {
-        CorporatePageNewSpider corporatePageSpider = new CorporatePageNewSpider();
+    public static ApplyListPageSpider build(String browserPath, WebCheckerContext webCheckerContext) throws IOException {
+        ApplyListPageSpider corporatePageSpider = new ApplyListPageSpider();
         corporatePageSpider.setWebCheckerContext(webCheckerContext);
         corporatePageSpider.createBrowser(browserPath);
         // 设置浏览器的监听器
@@ -161,10 +163,10 @@ public class CorporatePageNewSpider implements PageSpider {
     }
 
     @Override
-    public void start(List<ItemList> list) {
+    public void start(List<ApplyList> list) {
         WebCheckerUi ui = this.webCheckerContext.getUi();
         try {
-            ui.changeStatusInfo("正在进行首次登录");
+            ui.postEvent(new ChangeInfoInnerEvent("正在进行首次登录"));
             // 首次登录
             Page login = browser.newPage();
             login.goTo("https://zwdtuser.sh.gov.cn/uc/login/login.jsp");
@@ -174,27 +176,27 @@ public class CorporatePageNewSpider implements PageSpider {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        DaoService itemListService = this.webCheckerContext.getDaoService();
-        LinkedBlockingDeque<ItemList> updateList = itemListService.getUpdateList();
+        DaoService<ApplyList> itemListService = this.webCheckerContext.getDaoService();
+        LinkedBlockingDeque<ApplyList> updateList = itemListService.getUpdateList();
         PageNavigateOptions pageNavigateOptions = new PageNavigateOptions();
         List<String> wait = new ArrayList<>();
         wait.add("domcontentloaded");
         pageNavigateOptions.setWaitUntil(wait);
         pageNavigateOptions.setTimeout(0);
         // 设置快捷键
-        ApplyPageHotkeyListener applyPageHotkeyListener = listenKey(webCheckerContext);
-        webCheckerContext.setApplyPageHotkeyListener(applyPageHotkeyListener);
-        for (ItemList itemList : itemListService.getList()) {
+        NewApplyPageHotkeyListener applyPageHotkeyListener = listenKey(webCheckerContext);
+        webCheckerContext.setHotkeyListener(applyPageHotkeyListener);
+        for (ApplyList applyList : itemListService.getList()) {
             try {
                 Page page = browser.newPage();
-                ui.changeStatusInfo("正在扫描事项:" + itemList.getItemCode() + " " + itemList.getItemName());
-                page.goTo(itemList.getApplyUrl(), pageNavigateOptions);
+                ui.postEvent(new ChangeInfoInnerEvent("正在扫描事项"));
+                page.goTo(applyList.getApplyUrl(), pageNavigateOptions);
                 webCheckerContext.setNowInfoPage(page);
-                ui.changeStatusInfo("正在检查是否有立即办理");
+                ui.postEvent(new ChangeInfoInnerEvent("正在检查是否有立即办理"));
                 CountDownLatch countDownLatch = new CountDownLatch(1);
-                listenUserKey(applyPageHotkeyListener,countDownLatch,itemList);
+                listenUserKey(applyPageHotkeyListener,countDownLatch,applyList);
                 countDownLatch.await();
-                updateList.put(itemList);
+                updateList.put(applyList);
                 page.close();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -214,10 +216,10 @@ public class CorporatePageNewSpider implements PageSpider {
             // 准备好了打开立即办理页面  让监听器开始工作
             SaveApplyUrlBrowserHandler saveApplyUrlBrowserHandler = this.getSaveApplyUrlBrowserHandler();
             saveApplyUrlBrowserHandler.setPrepareClickApplyBtn(true);
-            ui.changeStatusInfo("点击立即办理");
+            ui.postEvent(new ChangeInfoInnerEvent("点击立即办理"));
             apply.click();
             if(showGjModel){
-                ui.changeStatusInfo("存在新弹窗,点击立即前往");
+                ui.postEvent(new ChangeInfoInnerEvent("存在新弹窗,点击立即前往"));
                 ElementHandle ljqwBt = page.waitForSelector("#bwptBtn");
                 boolean intersectingViewport = ljqwBt.isIntersectingViewport();
                 int tryTimes = 5;
@@ -238,8 +240,8 @@ public class CorporatePageNewSpider implements PageSpider {
     * @author YuChen
     * @date 2020/10/16 15:23
     */
-    private void listenUserKey(ApplyPageHotkeyListener applyPageHotkeyListener ,CountDownLatch countDownLatch, ItemList itemList) {
-        applyPageHotkeyListener.setItemList(itemList);
+    private void listenUserKey(NewApplyPageHotkeyListener applyPageHotkeyListener , CountDownLatch countDownLatch, ApplyList applyList) {
+        applyPageHotkeyListener.setApplyList(applyList);
         applyPageHotkeyListener.setCountDownLatch(countDownLatch);
     }
 
@@ -259,11 +261,11 @@ public class CorporatePageNewSpider implements PageSpider {
         return null;
     }
 
-    private static ApplyPageHotkeyListener listenKey(WebCheckerContext webCheckerContext) {
+    private static NewApplyPageHotkeyListener listenKey(WebCheckerContext webCheckerContext) {
         JIntellitype.getInstance().registerHotKey(1, JIntellitype.MOD_CONTROL, (int) '1');//crtl+1为快捷键
         JIntellitype.getInstance().registerHotKey(2, JIntellitype.MOD_CONTROL, (int) '2');//crtl+2为快捷键
         //添加监听
-        ApplyPageHotkeyListener applyPageHotkeyListener = new ApplyPageHotkeyListener();
+        NewApplyPageHotkeyListener applyPageHotkeyListener = new NewApplyPageHotkeyListener();
         JIntellitype.getInstance().addHotKeyListener(applyPageHotkeyListener);
         applyPageHotkeyListener.setWebCheckerContext(webCheckerContext);
         return applyPageHotkeyListener;

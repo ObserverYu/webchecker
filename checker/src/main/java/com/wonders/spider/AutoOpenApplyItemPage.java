@@ -12,8 +12,8 @@ import com.ruiyun.jvppeteer.options.LaunchOptionsBuilder;
 import com.ruiyun.jvppeteer.options.PageNavigateOptions;
 import com.ruiyun.jvppeteer.options.Viewport;
 import com.wonders.WebCheckerContext;
-import com.wonders.dao.ItemListService;
-import com.wonders.spider.entity.ItemList;
+import com.wonders.dao.service.ItemListService;
+import com.wonders.dao.entity.ItemList;
 import com.wonders.spider.handler.FailLoginBrowserHandler;
 import com.wonders.spider.handler.SaveApplyUrlBrowserHandler;
 

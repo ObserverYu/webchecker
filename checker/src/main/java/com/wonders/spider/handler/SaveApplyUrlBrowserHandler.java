@@ -4,7 +4,9 @@ import com.ruiyun.jvppeteer.core.page.Page;
 import com.ruiyun.jvppeteer.core.page.Target;
 import com.ruiyun.jvppeteer.events.EventHandler;
 import com.wonders.WebCheckerContext;
+import com.wonders.hotkey.ItemPageHotKeyListener;
 import com.wonders.spider.CorporatePageSpider;
+import com.wonders.ui.webinnerevent.ChangeInfoInnerEvent;
 import lombok.Data;
 
 /**
@@ -24,7 +26,7 @@ public class SaveApplyUrlBrowserHandler implements EventHandler<Target> {
     // 是否已经准备点击立即办理按钮
     private volatile boolean prepareClickApplyBtn = false;
 
-    private ApplyPageHotkeyListener applyPageHotkeyListener;
+    private ItemPageHotKeyListener applyPageHotkeyListener;
 
 
     public SaveApplyUrlBrowserHandler(CorporatePageSpider corporatePageSpider) {
@@ -38,7 +40,7 @@ public class SaveApplyUrlBrowserHandler implements EventHandler<Target> {
     @Override
     public void onEvent(Target event) {
         if(prepareClickApplyBtn){
-            webCheckerContext.getUi().changeStatusInfo("立即办理页面已经打开,请判断页面是否异常,按快捷键确认");
+            webCheckerContext.getUi().postEvent(new ChangeInfoInnerEvent("立即办理页面已经打开,请判断页面是否异常,按快捷键确认"));
             String url = event.url();
             System.out.println("检测到新的立即办理标签打开,初始url:"+url);
             Page page = event.page();

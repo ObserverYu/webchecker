@@ -6,6 +6,7 @@ import com.ruiyun.jvppeteer.core.page.Page;
 import com.ruiyun.jvppeteer.events.EventHandler;
 import com.wonders.WebCheckerContext;
 import com.wonders.spider.CorporatePageSpider;
+import com.wonders.ui.webinnerevent.ChangeInfoInnerEvent;
 import com.wonders.util.PageHandleUtil;
 
 /**
@@ -42,8 +43,9 @@ public class FailLoginPageHandler implements EventHandler<Frame> {
         if(!url.startsWith(PageHandleUtil.personLoginUrl) && !url.startsWith(PageHandleUtil.corporateLoginUrl)){
             return;
         }
-        webCheckerContext.getUi().changeStatusInfo("检测到登录页面,开始自动登录流程");
+        webCheckerContext.getUi().postEvent(new ChangeInfoInnerEvent("检测到登录页面,开始自动登录流程"));
         PageHandleUtil.handleLoginPage(url,page);
-        webCheckerContext.getUi().changeStatusInfo("立即办理页面已经打开,请判断页面是否异常,按快捷键确认");
+        webCheckerContext.getUi().postEvent(new ChangeInfoInnerEvent("立即办理页面已经打开,请判断页面是否异常,按快捷键确认"));
+
     }
 }

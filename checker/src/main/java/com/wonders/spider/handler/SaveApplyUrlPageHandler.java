@@ -4,7 +4,8 @@ import com.ruiyun.jvppeteer.core.page.Frame;
 import com.ruiyun.jvppeteer.core.page.Page;
 import com.ruiyun.jvppeteer.events.EventHandler;
 import com.wonders.WebCheckerContext;
-import com.wonders.spider.entity.ItemList;
+import com.wonders.dao.entity.ItemList;
+import com.wonders.hotkey.ItemPageHotKeyListener;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -27,7 +28,7 @@ public class SaveApplyUrlPageHandler implements EventHandler<Frame> {
 
     private SaveApplyUrlBrowserHandler saveApplyUrlBrowserHandler;
 
-    private ApplyPageHotkeyListener applyPageHotkeyListener;
+    private ItemPageHotKeyListener applyPageHotkeyListener;
 
     public SaveApplyUrlPageHandler(WebCheckerContext webCheckerContext,Page page
             ,SaveApplyUrlBrowserHandler saveApplyUrlBrowserHandler) {

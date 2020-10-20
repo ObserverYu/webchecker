@@ -2,7 +2,7 @@ package com.wonders.ui.listener;
 
 import com.ruiyun.jvppeteer.core.browser.Browser;
 import com.wonders.WebCheckerContext;
-import com.wonders.dao.DaoService;
+import com.wonders.dao.service.DaoService;
 import com.wonders.spider.PageSpider;
 
 import java.awt.event.WindowAdapter;

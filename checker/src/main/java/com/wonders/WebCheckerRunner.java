@@ -1,6 +1,6 @@
 package com.wonders;
 
-import com.wonders.ui.WebCheckerUi;
+import com.wonders.ui.WebCheckerUiImp;
 import lombok.Data;
 
 /**
@@ -13,7 +13,7 @@ public class WebCheckerRunner {
 
     public static void main(String[] args) {
         WebCheckerContext checkerContext = new WebCheckerContext();
-        WebCheckerUi.build(checkerContext);
+        WebCheckerUiImp.build(checkerContext);
     }
 
 }

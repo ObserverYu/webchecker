@@ -1,9 +1,9 @@
-package com.wonders.spider.handler;
+package com.wonders.hotkey;
 
 import com.melloware.jintellitype.HotkeyListener;
 import com.ruiyun.jvppeteer.core.page.Page;
 import com.wonders.WebCheckerContext;
-import com.wonders.spider.entity.ItemList;
+import com.wonders.dao.entity.ItemList;
 import lombok.Data;
 
 import java.util.concurrent.CountDownLatch;
@@ -14,7 +14,7 @@ import java.util.concurrent.CountDownLatch;
  **/
 
 @Data
-public class ApplyPageNewHotkeyListener implements HotkeyListener {
+public class ItemPageHotKeyListener implements HotkeyListener {
 
     private WebCheckerContext webCheckerContext;
     private CountDownLatch countDownLatch;
@@ -47,8 +47,10 @@ public class ApplyPageNewHotkeyListener implements HotkeyListener {
         }
         if(this.itemList != null){
             Page nowApplyPage = webCheckerContext.getNowApplyPage();
-            String url = nowApplyPage.mainFrame().url();
-            System.out.println(url);
+            if(nowApplyPage != null){
+                String url = nowApplyPage.mainFrame().url();
+                System.out.println(url);
+            }
             itemList.setResult(result);
             this.itemList = null;
         }

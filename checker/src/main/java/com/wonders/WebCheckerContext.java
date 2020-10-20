@@ -1,9 +1,9 @@
 package com.wonders;
 
+import com.melloware.jintellitype.HotkeyListener;
 import com.ruiyun.jvppeteer.core.page.Page;
-import com.wonders.dao.DaoService;
+import com.wonders.dao.service.DaoService;
 import com.wonders.spider.PageSpider;
-import com.wonders.spider.handler.ApplyPageHotkeyListener;
 import com.wonders.ui.WebCheckerUi;
 import lombok.Data;
 
@@ -27,6 +27,8 @@ public class WebCheckerContext {
     // 当前正打开的办事指南页面
     private Page nowInfoPage;
 
-    private ApplyPageHotkeyListener applyPageHotkeyListener;
+    private HotkeyListener hotkeyListener;
+
+
 
 }

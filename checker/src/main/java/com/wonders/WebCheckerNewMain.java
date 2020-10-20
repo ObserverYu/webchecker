@@ -1,8 +1,8 @@
 package com.wonders;
 
-import com.wonders.dao.ItemListNewService;
-import com.wonders.spider.CorporatePageNewSpider;
-import com.wonders.ui.WebCheckerUi;
+import com.wonders.dao.service.ApplyListService;
+import com.wonders.spider.ApplyListPageSpider;
+import com.wonders.ui.WebCheckerUiImp;
 import lombok.Data;
 
 import java.io.IOException;
@@ -17,9 +17,9 @@ public class WebCheckerNewMain {
 
     public static void main(String[] args) throws IOException {
         WebCheckerContext checkerContext = new WebCheckerContext();
-        WebCheckerUi.build(checkerContext);
-        CorporatePageNewSpider corporatePageSpider = CorporatePageNewSpider.build(null, checkerContext);
-        ItemListNewService dao = ItemListNewService.build(null, null, null, checkerContext);
+        WebCheckerUiImp.build(checkerContext);
+        ApplyListPageSpider corporatePageSpider = ApplyListPageSpider.build(null, checkerContext);
+        ApplyListService dao = ApplyListService.build(null, null, null, checkerContext);
         dao.startUpdate();
         corporatePageSpider.start(dao.getList());
 

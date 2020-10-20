@@ -8,9 +8,9 @@ import com.ruiyun.jvppeteer.options.LaunchOptions;
 import com.ruiyun.jvppeteer.options.LaunchOptionsBuilder;
 import com.ruiyun.jvppeteer.options.PageNavigateOptions;
 import com.ruiyun.jvppeteer.options.Viewport;
-import com.wonders.dao.ItemListService;
-import com.wonders.spider.entity.ItemList;
-import com.wonders.spider.handler.ApplyPageHotkeyListener;
+import com.wonders.dao.service.ItemListService;
+import com.wonders.dao.entity.ItemList;
+import com.wonders.hotkey.ItemPageHotKeyListener;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ public class OpenApplyItemPage {
         PageNavigateOptions pageNavigateOptions = new PageNavigateOptions();
         pageNavigateOptions.setTimeout(0);
         //Scanner scanner = new Scanner(System.in);
-        ApplyPageHotkeyListener applyPageHotkeyListener = listenKey();
+        ItemPageHotKeyListener applyPageHotkeyListener = listenKey();
         for (ItemList itemList : itemListService.getList()) {
             Page page = browser.newPage();
             System.out.println("打开:"+itemList.toString());
@@ -54,11 +54,11 @@ public class OpenApplyItemPage {
         browser.close();
     }
 
-    private static ApplyPageHotkeyListener listenKey() {
+    private static ItemPageHotKeyListener listenKey() {
         JIntellitype.getInstance().registerHotKey(1, JIntellitype.MOD_CONTROL, (int) '1');//crtl+1为快捷键
         JIntellitype.getInstance().registerHotKey(2, JIntellitype.MOD_CONTROL, (int) '2');//crtl+2为快捷键
         //添加监听
-        ApplyPageHotkeyListener applyPageHotkeyListener = new ApplyPageHotkeyListener();
+        ItemPageHotKeyListener applyPageHotkeyListener = new ItemPageHotKeyListener();
         JIntellitype.getInstance().addHotKeyListener(applyPageHotkeyListener);
         return applyPageHotkeyListener;
     }

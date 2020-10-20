@@ -1,4 +1,4 @@
-package com.wonders.spider.entity;
+package com.wonders.dao.entity;
 
 import lombok.Data;
 import lombok.ToString;

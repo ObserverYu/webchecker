@@ -1,7 +1,7 @@
-package com.wonders.dao;
+package com.wonders.dao.mapper;
 
 
-import com.wonders.spider.entity.ItemList;
+import com.wonders.dao.entity.ItemList;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -23,7 +23,7 @@ public interface ItemListMapper{
     List<ItemList> selectByWeiBanListAndCondition(@Param("weiban") List<String> weiban
             , @Param("apply") Integer apply, @Param("result") String result);
 
-    List<ItemList> selectByIdFanwei(@Param("from")Integer idFrom,@Param("to") Integer idTo);
+    List<ItemList> selectByIdRange(@Param("from")Integer idFrom, @Param("to") Integer idTo);
 
     void update(@Param("item") ItemList item);
 }

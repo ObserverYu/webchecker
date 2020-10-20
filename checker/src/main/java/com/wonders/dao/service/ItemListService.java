@@ -1,7 +1,9 @@
-package com.wonders.dao;
+package com.wonders.dao.service;
 
 import com.wonders.WebCheckerContext;
-import com.wonders.spider.entity.ItemList;
+import com.wonders.dao.MySqlFactoryBuilder;
+import com.wonders.dao.entity.ItemList;
+import com.wonders.dao.mapper.ItemListMapper;
 import lombok.Data;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -17,7 +19,7 @@ import java.util.concurrent.LinkedBlockingDeque;
  **/
 
 @Data
-public class ItemListNewService implements DaoService {
+public class ItemListService implements DaoService<ItemList> {
 
     private ItemListMapper itemListMapper;
 
@@ -31,29 +33,36 @@ public class ItemListNewService implements DaoService {
 
     private Thread worker;
 
-    public static ItemListNewService build(List<String> weibanList){
+    public static ItemListService build(List<String> weibanList){
         return build(weibanList,null,null);
     }
 
-    public static ItemListNewService build(List<String> weibanList, Integer apply, String result){
+    public static ItemListService build(List<String> weibanList,Integer apply, String result){
         return build(weibanList,apply,result,null);
     }
 
-    public static ItemListNewService build(List<String> weibanList, Integer apply, String result, WebCheckerContext context){
+    public static ItemListService build(List<String> weibanList,Integer apply, String result, WebCheckerContext context){
         // 持久层
-        ItemListNewService itemListService = new ItemListNewService();
+        ItemListService itemListService = new ItemListService();
         itemListService.init(weibanList,apply,result);
-        context.setDaoService(itemListService);
         return itemListService;
     }
 
     @Override
-    public void init(List<String> weibanList, Integer apply, String result) {
+    public void init(Object ...param) {
+        List<String> weibanList = null;
+        Integer apply = null;
+        String result = null;
+        if(param != null && param.length == 3){
+            weibanList = (List<String>)param[0];
+            apply = (Integer)param[1];
+            result = (String)param[2];
+        }
         SqlSessionFactory build = MySqlFactoryBuilder.build();
         SqlSession sqlSession = build.openSession();
         ItemListMapper mapper = sqlSession.getMapper(ItemListMapper.class);
         this.setItemListMapper(mapper);
-        List<ItemList> allWeibanItem = mapper.selectByIdFanwei(2567,2884);
+        List<ItemList> allWeibanItem = mapper.selectByWeiBanListAndCondition(weibanList,apply,result);
         this.setList(allWeibanItem);
         this.setCount(allWeibanItem.size());
         LinkedBlockingDeque<ItemList> updateList = new LinkedBlockingDeque<>();
@@ -61,7 +70,15 @@ public class ItemListNewService implements DaoService {
     }
 
     @Override
-    public void updateOriginal(List<String> weibanList, Integer apply, String result) {
+    public void updateOriginal(Object ...param) {
+        List<String> weibanList = null;
+        Integer apply = null;
+        String result = null;
+        if(param != null && param.length == 3){
+            weibanList = (List<String>)param[0];
+            apply = (Integer)param[1];
+            result = (String)param[2];
+        }
         List<ItemList> allWeibanItem = getItemListMapper().selectByWeiBanListAndCondition(weibanList,apply,result);
         this.setList(allWeibanItem);
         this.setCount(allWeibanItem.size());

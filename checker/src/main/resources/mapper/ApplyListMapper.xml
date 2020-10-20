@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wonders.dao.mapper.ApplyListMapper">
+ 
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wonders.dao.entity.ApplyList">
+        <id column="id" property="id"/>
+        <result column="item_code" property="itemCode"/>
+        <result column="item_type" property="itemType"/>
+        <result column="item_name" property="itemName"/>
+        <result column="qingxing" property="qingxing"/>
+        <result column="checker" property="checker"/>
+        <result column="result" property="result"/>
+        <result column="apply_url" property="applyUrl"/>
+        <result column="tencode" property="tencode"/>
+        <result column="area" property="area"/>
+        <result column="apply_code" property="applyCode"/>
+        <result column="weiban_name" property="weibanName"/>
+        <result column="tencode" property="tencode"/>
+        <result column="area" property="area"/>
+    </resultMap>
+
+
+    <update id="update">
+        update apply_list
+        set result = #{item.result}
+        ,apply_url = #{item.applyUrl}
+        ,result = #{item.result}
+        where id = #{item.id}
+    </update>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        select * from apply_list
+    </select>
+
+    <select id="selectByIdRange" resultMap="BaseResultMap">
+        select * from apply_list where id between #{from} and #{to}
+    </select>
+
+</mapper>

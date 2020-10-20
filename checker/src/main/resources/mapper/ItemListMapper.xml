@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.wonders.dao.ItemListMapper">
+<mapper namespace="com.wonders.dao.mapper.ItemListMapper">
  
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.wonders.spider.entity.ItemList">
+    <resultMap id="BaseResultMap" type="com.wonders.dao.entity.ItemList">
         <id column="id" property="id"/>
         <result column="item_code" property="itemCode"/>
         <result column="item_type" property="itemType"/>
@@ -75,7 +75,7 @@
         </if>
     </select>
 
-    <select id="selectByIdFanwei" resultMap="BaseResultMap">
+    <select id="selectByIdRange" resultMap="BaseResultMap">
         select * from item_list where id between #{from} and #{to} and result = '未检查'
     </select>
 

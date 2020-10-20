@@ -13,12 +13,13 @@ import com.ruiyun.jvppeteer.options.LaunchOptionsBuilder;
 import com.ruiyun.jvppeteer.options.PageNavigateOptions;
 import com.ruiyun.jvppeteer.options.Viewport;
 import com.wonders.WebCheckerContext;
-import com.wonders.dao.DaoService;
-import com.wonders.spider.entity.ItemList;
-import com.wonders.spider.handler.ApplyPageHotkeyListener;
+import com.wonders.dao.entity.ItemList;
+import com.wonders.dao.service.DaoService;
+import com.wonders.hotkey.ItemPageHotKeyListener;
 import com.wonders.spider.handler.FailLoginBrowserHandler;
 import com.wonders.spider.handler.SaveApplyUrlBrowserHandler;
 import com.wonders.ui.WebCheckerUi;
+import com.wonders.ui.webinnerevent.ChangeInfoInnerEvent;
 import com.wonders.util.PageHandleUtil;
 import lombok.Data;
 
@@ -35,7 +36,7 @@ import java.util.concurrent.LinkedBlockingDeque;
  **/
 
 @Data
-public class CorporatePageSpider implements PageSpider {
+public class CorporatePageSpider implements PageSpider<ItemList> {
 
     WebCheckerContext webCheckerContext;
 
@@ -164,7 +165,7 @@ public class CorporatePageSpider implements PageSpider {
     public void start(List<ItemList> list) {
         WebCheckerUi ui = this.webCheckerContext.getUi();
         try {
-            ui.changeStatusInfo("正在进行首次登录");
+            ui.postEvent(new ChangeInfoInnerEvent("正在进行首次登录"));
             // 首次登录
             Page login = browser.newPage();
             login.goTo("https://zwdtuser.sh.gov.cn:7443/tsoauth/login.jsp");
@@ -174,7 +175,7 @@ public class CorporatePageSpider implements PageSpider {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        DaoService itemListService = this.webCheckerContext.getDaoService();
+        DaoService<ItemList> itemListService = this.webCheckerContext.getDaoService();
         LinkedBlockingDeque<ItemList> updateList = itemListService.getUpdateList();
         PageNavigateOptions pageNavigateOptions = new PageNavigateOptions();
         List<String> wait = new ArrayList<>();
@@ -182,20 +183,20 @@ public class CorporatePageSpider implements PageSpider {
         pageNavigateOptions.setWaitUntil(wait);
         pageNavigateOptions.setTimeout(0);
         // 设置快捷键
-        ApplyPageHotkeyListener applyPageHotkeyListener = listenKey(webCheckerContext);
-        webCheckerContext.setApplyPageHotkeyListener(applyPageHotkeyListener);
+        ItemPageHotKeyListener applyPageHotkeyListener = listenKey(webCheckerContext);
+        webCheckerContext.setHotkeyListener(applyPageHotkeyListener);
         for (ItemList itemList : itemListService.getList()) {
             try {
                 Page page = browser.newPage();
-                ui.changeStatusInfo("正在扫描事项:" + itemList.getItemCode() + " " + itemList.getItemName());
+                ui.postEvent(new ChangeInfoInnerEvent("正在扫描事项:" + itemList.getItemCode() + " " + itemList.getItemName()));
                 page.goTo(itemList.getUrl(), pageNavigateOptions);
                 webCheckerContext.setNowInfoPage(page);
-                ui.changeStatusInfo("正在检查是否有立即办理");
+                ui.postEvent(new ChangeInfoInnerEvent("正在检查是否有立即办理"));
                 // 检查是否有立即办理按钮
                 ElementHandle applyBtn = checkApplyButton(page, itemList);
                 CountDownLatch countDownLatch = new CountDownLatch(1);
                 if(applyBtn != null){
-                    ui.changeStatusInfo("有立即办理,打开");
+                    ui.postEvent(new ChangeInfoInnerEvent("有立即办理,打开"));
                     itemList.setApply(1);
                     // 点击立即办理按钮
                     clickApply(page,applyBtn);
@@ -225,10 +226,10 @@ public class CorporatePageSpider implements PageSpider {
             // 准备好了打开立即办理页面  让监听器开始工作
             SaveApplyUrlBrowserHandler saveApplyUrlBrowserHandler = this.getSaveApplyUrlBrowserHandler();
             saveApplyUrlBrowserHandler.setPrepareClickApplyBtn(true);
-            ui.changeStatusInfo("点击立即办理");
+            ui.postEvent(new ChangeInfoInnerEvent("点击立即办理"));
             apply.click();
             if(showGjModel){
-                ui.changeStatusInfo("存在新弹窗,点击立即前往");
+                ui.postEvent(new ChangeInfoInnerEvent("存在新弹窗,点击立即前往"));
                 ElementHandle ljqwBt = page.waitForSelector("#bwptBtn");
                 boolean intersectingViewport = ljqwBt.isIntersectingViewport();
                 int tryTimes = 5;
@@ -249,7 +250,7 @@ public class CorporatePageSpider implements PageSpider {
     * @author YuChen
     * @date 2020/10/16 15:23
     */
-    private void listenUserKey(ApplyPageHotkeyListener applyPageHotkeyListener ,CountDownLatch countDownLatch, ItemList itemList) {
+    private void listenUserKey(ItemPageHotKeyListener applyPageHotkeyListener , CountDownLatch countDownLatch, ItemList itemList) {
         applyPageHotkeyListener.setItemList(itemList);
         applyPageHotkeyListener.setCountDownLatch(countDownLatch);
     }
@@ -270,11 +271,11 @@ public class CorporatePageSpider implements PageSpider {
         return null;
     }
 
-    private static ApplyPageHotkeyListener listenKey(WebCheckerContext webCheckerContext) {
+    private static ItemPageHotKeyListener listenKey(WebCheckerContext webCheckerContext) {
         JIntellitype.getInstance().registerHotKey(1, JIntellitype.MOD_CONTROL, (int) '1');//crtl+1为快捷键
         JIntellitype.getInstance().registerHotKey(2, JIntellitype.MOD_CONTROL, (int) '2');//crtl+2为快捷键
         //添加监听
-        ApplyPageHotkeyListener applyPageHotkeyListener = new ApplyPageHotkeyListener();
+        ItemPageHotKeyListener applyPageHotkeyListener = new ItemPageHotKeyListener();
         JIntellitype.getInstance().addHotKeyListener(applyPageHotkeyListener);
         applyPageHotkeyListener.setWebCheckerContext(webCheckerContext);
         return applyPageHotkeyListener;

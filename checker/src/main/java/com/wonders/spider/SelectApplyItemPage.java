@@ -9,8 +9,8 @@ import com.ruiyun.jvppeteer.options.LaunchOptions;
 import com.ruiyun.jvppeteer.options.LaunchOptionsBuilder;
 import com.ruiyun.jvppeteer.options.PageNavigateOptions;
 import com.ruiyun.jvppeteer.options.Viewport;
-import com.wonders.dao.ItemListService;
-import com.wonders.spider.entity.ItemList;
+import com.wonders.dao.service.ItemListService;
+import com.wonders.dao.entity.ItemList;
 
 import java.io.IOException;
 import java.util.ArrayList;
